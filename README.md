@@ -14,3 +14,5 @@ pipx install taskcluster-inspect
 ```
 tc-inspect --help
 ```
+
+[0]: https://pypa.github.io/pipx/
