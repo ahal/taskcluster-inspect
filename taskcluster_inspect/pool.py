@@ -3,17 +3,17 @@ import taskcluster
 wm = taskcluster.WorkerManager(taskcluster.optionsFromEnvironment())
 
 
-def list_worker_pools(only_pools=None):
+def list_pools(only_pools=None):
     pools = wm.listWorkerPools()["workerPools"]
     return [
-        p["workerPoolId"]
+        p
         for p in pools
         if not only_pools or p["workerPoolId"] in only_pools
     ]
 
 
 def list_workers(state=None, **pool_args):
-    pools = list_worker_pools(**pool_args)
+    pools = [p["workerPoolId"] for p in list_pools(**pool_args)]
     workers = []
 
     for pool in pools:
