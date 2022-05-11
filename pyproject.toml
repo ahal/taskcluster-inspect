@@ -13,6 +13,9 @@ taskcluster = "^44.13.6"
 
 [tool.poetry.dev-dependencies]
 
+[tool.poetry.scripts]
+tc-inspect = 'taskcluster_inspect.console.application:cli'
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

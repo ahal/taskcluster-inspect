@@ -32,4 +32,3 @@ def list_workers(state=None, **pool_args):
         [w for w in workers if not state or w["state"] == state],
         key=lambda w: w["workerPoolId"],
     )
-
