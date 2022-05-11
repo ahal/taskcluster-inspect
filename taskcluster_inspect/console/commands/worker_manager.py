@@ -13,12 +13,21 @@ class ListPoolsCommand(Command):
 
     pools
         {--filter= : Only display pools that match the given regular expression.}
+        {--json : Display pools in JSON format.}
     """
 
     def handle(self):
-        pattern = self.option("filter")
-
         pools = etl.fromdicts(list_pools())
+        pattern = self.option("filter")
+        if pattern:
+            pools = pools.select(lambda row: re.search(pattern, row.workerPoolId))
+
+        if self.option("json"):
+            sink = etl.StdoutSource()
+            pools = pools.cutout("config")
+            pools.tojson(sink, indent=2)
+            return
+
         keys_to_remove = [
             "config",
             "created",
@@ -31,10 +40,7 @@ class ListPoolsCommand(Command):
             "stoppedCount",
             "stoppedCapacity",
         ]
-        pools = etl.cutout(pools, *keys_to_remove)
-        if pattern:
-            pools = etl.select(pools, lambda row: re.search(pattern, row.workerPoolId))
-
+        pools = pools.cutout(*keys_to_remove)
         print(tabulate(pools, headers="firstrow"))
 
 
