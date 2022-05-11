@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "taskcluster-inspect"
+version = "0.1.0"
+description = "A simple command line tool for inspecting Taskcluster state."
+authors = ["Andrew Halberstadt <ahal@pm.me>"]
+license = "MPL-2.0"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+cleo = "^0.8.1"
+tabulate = "^0.8.9"
+taskcluster = "^44.13.6"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
