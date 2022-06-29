@@ -9,12 +9,15 @@ class ListWorkersCommand(Command):
     Display workers in the given pool.
 
     list
-        {--state= : Only list workers with the given state.}
+        {--state=running : Only list workers with the given state (default:
+                           running). Use "all" to list all states.}
     """
 
     def handle(self):
         pool = self.argument("id")
         state = self.option("state")
+        if state == "all":
+            state = None
         workers = list_workers(state=state, only_pools=pool)
         print(tabulate(workers, headers="keys"))
 
