@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "taskcluster-inspect"
-version = "0.1.0"
+version = "0.2.0"
 description = "A simple command line tool for inspecting Taskcluster state."
 authors = ["Andrew Halberstadt <ahal@pm.me>"]
 license = "MPL-2.0"
