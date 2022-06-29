@@ -1,19 +1,17 @@
 import taskcluster
+from taskcluster.exceptions import TaskclusterRestFailure
 
+queue = taskcluster.Queue(taskcluster.optionsFromEnvironment())
 wm = taskcluster.WorkerManager(taskcluster.optionsFromEnvironment())
 
 
-def list_pools(only_pools=None):
+def get_pools(only_pools=None):
     pools = wm.listWorkerPools()["workerPools"]
-    return [
-        p
-        for p in pools
-        if not only_pools or p["workerPoolId"] in only_pools
-    ]
+    return [p for p in pools if not only_pools or p["workerPoolId"] in only_pools]
 
 
-def list_workers(state=None, **pool_args):
-    pools = [p["workerPoolId"] for p in list_pools(**pool_args)]
+def get_workers(state=None, **pool_args):
+    pools = [p["workerPoolId"] for p in get_pools(**pool_args)]
     workers = []
 
     for pool in pools:
@@ -32,3 +30,20 @@ def list_workers(state=None, **pool_args):
         [w for w in workers if not state or w["state"] == state],
         key=lambda w: w["workerPoolId"],
     )
+
+
+def get_worker_tasks(worker: dict):
+    """Get most recent tasks (up to 20) for each worker in a specified pool.
+
+    Args:
+        worker (dict): A worker definition.
+
+    Returns:
+        list: A list of taskId's.
+    """
+    provisioner, worker_type = worker["workerPoolId"].split("/")
+
+    tasks = queue.getWorker(
+        provisioner, worker_type, worker["workerGroup"], worker["workerId"]
+    )["recentTasks"]
+    return [t["taskId"] for t in tasks]

@@ -4,7 +4,7 @@ import petl as etl
 from cleo import Command
 from tabulate import tabulate
 
-from taskcluster_inspect.pool import list_pools
+from taskcluster_inspect.pool import get_pools
 
 
 class ListPoolsCommand(Command):
@@ -17,7 +17,7 @@ class ListPoolsCommand(Command):
     """
 
     def handle(self):
-        pools = etl.fromdicts(list_pools())
+        pools = etl.fromdicts(get_pools())
         pattern = self.option("filter")
         if pattern:
             pools = pools.select(lambda row: re.search(pattern, row.workerPoolId))
