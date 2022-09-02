@@ -1,10 +1,11 @@
 import re
+from pprint import pprint
 
 import petl as etl
 from cleo import Command
 from tabulate import tabulate
 
-from taskcluster_inspect.pool import get_pools
+from taskcluster_inspect.pool import get_images, get_pools
 
 
 class ListPoolsCommand(Command):
@@ -44,6 +45,31 @@ class ListPoolsCommand(Command):
         print(tabulate(pools, headers="firstrow"))
 
 
+class ListImagesCommand(Command):
+    """
+    Display images and the pools associated with them.
+
+    images
+        {--filter= : Only display images associated with pools matching the given regular expression.}
+        {--json : Display images in JSON format.}
+    """
+    def handle(self):
+        images = get_images()
+
+        pattern = self.option("filter")
+        if pattern:
+            for k, v in images.items():
+                images[k] = {pool for pool in v if re.search(pattern, pool)}
+
+        images = {k: v for k, v in images.items() if v}
+        if self.option("json"):
+            pprint(images, indent=2)
+            return
+
+        images = [(k, "\n".join(sorted(images[k]))) for k in sorted(images)]
+        print(tabulate(images, headers=["Image", "Pools"]))
+
+
 class WorkerManagerCommands(Command):
     """
     Contains commands that operate directly on worker-manager.
@@ -51,7 +77,7 @@ class WorkerManagerCommands(Command):
     wm
     """
 
-    commands = [ListPoolsCommand()]
+    commands = [ListPoolsCommand(), ListImagesCommand()]
 
     def handle(self):
         return self.call("help", self._config.name)

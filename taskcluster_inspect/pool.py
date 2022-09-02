@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import taskcluster
 from taskcluster.exceptions import TaskclusterRestFailure
 
@@ -8,6 +10,30 @@ wm = taskcluster.WorkerManager(taskcluster.optionsFromEnvironment())
 def get_pools(only_pools=None):
     pools = wm.listWorkerPools()["workerPools"]
     return [p for p in pools if not only_pools or p["workerPoolId"] in only_pools]
+
+
+def get_images(**pool_args):
+    pools_by_image = defaultdict(set)
+    for pool in get_pools(**pool_args):
+        if not pool["config"]:
+            continue
+
+        images = set()
+        for launch_config in pool["config"]["launchConfigs"]:
+            if pool["providerId"] == "aws":
+                images.add(launch_config["launchConfig"]["ImageId"])
+
+            elif pool["providerId"] == "gcp":
+                for launch_config in pool["config"]["launchConfigs"]:
+                    for disk in launch_config["disks"]:
+                        if not disk["boot"]:
+                            continue
+                        images.add(disk["initializeParams"]["sourceImage"])
+
+        for image in images:
+            pools_by_image[image].add(pool["workerPoolId"])
+
+    return pools_by_image
 
 
 def get_workers(state=None, **pool_args):
