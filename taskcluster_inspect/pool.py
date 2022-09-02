@@ -23,10 +23,10 @@ def get_images(**pool_args):
             if pool["providerId"] == "aws":
                 images.add(launch_config["launchConfig"]["ImageId"])
 
-            elif pool["providerId"] == "gcp":
+            elif pool["providerId"].endswith("gcp"):
                 for launch_config in pool["config"]["launchConfigs"]:
                     for disk in launch_config["disks"]:
-                        if not disk["boot"]:
+                        if not disk.get("boot"):
                             continue
                         images.add(disk["initializeParams"]["sourceImage"])
 

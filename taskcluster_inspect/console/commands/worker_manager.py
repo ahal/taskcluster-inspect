@@ -1,5 +1,5 @@
+import json
 import re
-from pprint import pprint
 
 import petl as etl
 from cleo import Command
@@ -61,9 +61,9 @@ class ListImagesCommand(Command):
             for k, v in images.items():
                 images[k] = {pool for pool in v if re.search(pattern, pool)}
 
-        images = {k: v for k, v in images.items() if v}
+        images = {k: sorted(images[k]) for k in sorted(images.keys()) if images[k]}
         if self.option("json"):
-            pprint(images, indent=2)
+            print(json.dumps(images, indent=2))
             return
 
         images = [(k, "\n".join(sorted(images[k]))) for k in sorted(images)]
