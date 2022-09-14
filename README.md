@@ -1,3 +1,5 @@
+[![PyPI version](https://badge.fury.io/py/taskcluster-inspect.svg)](https://badge.fury.io/py/taskcluster-inspect)
+
 # taskcluster-inspect
 
 A command line utility for inspecting the state of Taskcluster.
